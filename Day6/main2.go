@@ -72,10 +72,8 @@ func main() {
 
 	var arr [SIZE][SIZE]int
 	var arr2 [SIZE][SIZE]int
-	var arr3 [SIZE][SIZE]int
 	lineNumber := 0
 	var pos [2]int
-	var startPos [2]int
 	for scanner.Scan() {
 		line := scanner.Text()
 		for j := 0; j < SIZE; j++ {
@@ -83,48 +81,22 @@ func main() {
 				arr[lineNumber][j] = 0
 			} else if line[j] == '#' {
 				arr[lineNumber][j] = -1
-				arr3[lineNumber][j] = -1
 			} else if line[j] == '^' {
 				pos[0] = lineNumber
 				pos[1] = j
-				startPos[0] = lineNumber
-				startPos[1] = j
-				arr[lineNumber][j] = UP
-				arr3[lineNumber][j] = UP
 			}
 		}
 		lineNumber++
 	}
-	direction := [2]int{0, -1}
 	count := 0
 
-	for {
-		if pos[0]+direction[1] >= SIZE || pos[0]+direction[1] < 0 || pos[1]+direction[0] >= SIZE || pos[1]+direction[0] < 0 {
-			break
-		}
-		if arr[pos[0]+direction[1]][pos[1]+direction[0]] >= 0 {
-			if runSimulation(arr3, startPos, pos[0]+direction[1], pos[1]+direction[0]) {
-				arr2[pos[0]+direction[1]][pos[1]+direction[0]] = 1
+	for x := 0; x < SIZE; x++ {
+		for y := 0; y < SIZE; y++ {
+			if x == pos[0] && y == pos[1] {
+				continue
 			}
-
-			pos[0] += direction[1]
-			pos[1] += direction[0]
-			arr[pos[0]][pos[1]] = getDirection(&direction)
-
-		} else if arr[pos[0]+direction[1]][pos[1]+direction[0]] == -1 {
-
-			if direction[0] == 0 && direction[1] == -1 {
-				direction[0] = 1
-				direction[1] = 0
-			} else if direction[0] == 1 && direction[1] == 0 {
-				direction[0] = 0
-				direction[1] = 1
-			} else if direction[0] == 0 && direction[1] == 1 {
-				direction[0] = -1
-				direction[1] = 0
-			} else if direction[0] == -1 && direction[1] == 0 {
-				direction[0] = 0
-				direction[1] = -1
+			if runSimulation(arr, pos, x, y) {
+				arr2[x][y] = 1
 			}
 		}
 	}
