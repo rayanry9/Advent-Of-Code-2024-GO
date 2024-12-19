@@ -4,25 +4,9 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"slices"
 	"strconv"
 	"strings"
 )
-
-func calculateLen(memo *map[[2]int]int, num int, depth int, remTimes int) int {
-	val, ok := (*memo)[[2]int{num, remTimes}]
-	if ok {
-		return val
-	} else {
-		if remTimes == 0 {
-			return 1
-		}
-		if num == 0 {
-			val = calculateLen(memo, 1, depth+1, remTimes-1)
-		}
-	}
-
-}
 
 func main() {
 	file, _ := os.Open("./input.txt")
@@ -30,25 +14,64 @@ func main() {
 	scanner.Scan()
 	line := strings.Split(scanner.Text(), " ")
 
-	for range 25 {
-		for idx := len(line) - 1; idx >= 0; idx-- {
+	map1 := make(map[string]int)
+	map2 := make(map[string]int)
 
-			if line[idx] == "0" {
-				line[idx] = "1"
-			} else if len(line[idx])%2 == 0 {
-				num1, _ := strconv.Atoi(line[idx][:len(line[idx])/2])
-				num2, _ := strconv.Atoi(line[idx][len(line[idx])/2:])
-				numStr1 := strconv.Itoa(num1)
-				numStr2 := strconv.Itoa(num2)
-				line = slices.Concat(line[:idx], []string{numStr1, numStr2}, line[idx+1:])
-			} else {
-				num, _ := strconv.Atoi(line[idx])
-				num *= 2024
-				line[idx] = strconv.Itoa(num)
+	for idx := len(line) - 1; idx >= 0; idx-- {
+		val, _ := map1[line[idx]]
+		map1[line[idx]] = val + 1
+	}
+
+	times := 75
+
+	for i := range times {
+		if i%2 == 0 {
+			map2 = make(map[string]int)
+			for key, val := range map1 {
+				if key == "0" {
+					map2["1"] += val
+				} else if len(key)%2 == 0 {
+					map2[key[:len(key)/2]] += val
+					num, _ := strconv.Atoi(key[len(key)/2:])
+					map2[strconv.Itoa(num)] += val
+				} else {
+					num, _ := strconv.Atoi(key)
+					num *= 2024
+					numStr := strconv.Itoa(num)
+					map2[numStr] += val
+				}
 			}
+		} else {
 
+			map1 = make(map[string]int)
+			for key, val := range map2 {
+				if key == "0" {
+					map1["1"] += val
+				} else if len(key)%2 == 0 {
+					map1[key[:len(key)/2]] += val
+					num, _ := strconv.Atoi(key[len(key)/2:])
+					map1[strconv.Itoa(num)] += val
+				} else {
+					num, _ := strconv.Atoi(key)
+					num *= 2024
+					map1[strconv.Itoa(num)] += val
+				}
+			}
+		}
+
+	}
+
+	totalCount := 0
+
+	if times%2 == 0 {
+		for _, val := range map1 {
+			totalCount += val
+		}
+	} else {
+		for _, val := range map2 {
+			totalCount += val
 		}
 	}
-	fmt.Println(len(line))
+	fmt.Println(totalCount)
 
 }
